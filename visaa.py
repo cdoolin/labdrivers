@@ -8,7 +8,7 @@ class Vl63(object):
         self.l = visa.instrument("GPIB::%d" % port)
 
         self.idn = self.l.ask("*IDN?")
-        if idn.find("NewFocus 63") < 0:
+        if self.idn.find("NewFocus 63") < 0:
             self.connected = False
             del self.l
         else:
@@ -21,7 +21,7 @@ class Vl63(object):
         return self.connected
 
     def identity(self):
-        return self.identity
+        return self.idn
 
     def set_piezo(self, v):
         r = self.l.ask(":VOLT %.1f" % v)
@@ -37,8 +37,14 @@ class Vl63(object):
     def sense_wave(self):
         return float(self.l.ask(":SENS:WAVE"))
 
+    def set_wave(self, wave):
+        self.l.write(":WAVE %.2f" % float(wave))
+
     def sense_current(self):
         return float(self.l.ask(":SENS:CURR:DIOD"))
+
+    def set_current(self, current):
+        self.l.write(":CURR %.1f" % float(current))
 
     def set_local(self):
         self.l.write(":SYST:MCON EXT")
@@ -61,7 +67,7 @@ class Vl63(object):
     def set_slew_f(self, slew):
         self.l.ask(":WAVE:SLEW:FORW %s" % slew)
 
-    def get_slew_f(self, slew):
+    def get_slew_f(self):
         return self.l.ask(":WAVE:SLEW:FORW?")
 
     def set_slew_r(self, slew):
@@ -87,11 +93,11 @@ class Vl63(object):
         while int(self.l.ask("*OPC?")) is 0:
             time.sleep(.010)
 
-    def set_power(on):
+    def set_power(self, on):
         self.l.write(":OUTP %d" % int(on))
 
-    def powered():
-        return self.l.ask(":OUTP?")
+    def powered(self):
+        return int(self.l.ask(":OUTP?")) == 1
         
         
 
