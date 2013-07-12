@@ -1,28 +1,34 @@
 
-class BadDriver:
-    def __init__(self, *args, **kwargs):
+
+def mock(*args):
+    class Mock(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def ok(self):
+            return False
+
+    def dummy(self, *args, **kwargs):
         pass
 
-    def ok(self):
-        return False
+    for a in args:
+        setattr(Mock, str(a), dummy)
 
-    def start(self):
-        pass
+    return Mock
 
-    def stop(self):
-        pass
+
 
 try:
     from visaa import Vl63, WlMeter
 except ImportError:
     print("no visa")
-    Vl63 = BadDriver
-    WlMeter = BadDriver
+    Vl63 = mock()
+    WlMeter = mock('wl')
 
 try:
     from zmqq import QDaq, SA
 except ImportError:
     print("couldn't load zmq")
-    QDaq = BadDriver
-    SA = BadDriver
+    QDaq = mock('start', 'stop')
+    SA = mock('save', 'endsave')
 
