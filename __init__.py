@@ -25,10 +25,20 @@ except ImportError:
     Vl63 = mock()
     WlMeter = mock('wl')
 
+
+
 try:
     from zmqq import QDaq, SA
 except ImportError:
-    print("couldn't load zmq")
+    print("no zmq")
     QDaq = mock('start', 'stop')
     SA = mock('save', 'endsave')
+
+
+
+try:
+    from websocks import LaserClient
+except ImportError:
+    print("no websocket-client")
+    LaserClient = mock()
 

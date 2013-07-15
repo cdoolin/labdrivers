@@ -5,17 +5,23 @@ import time
 
 class Vl63(object):
     def __init__(self, port=9):
-        self.l = visa.instrument("GPIB::%d" % port)
+        self.connect(port)
 
-        self.idn = self.l.ask("*IDN?")
-        if self.idn.find("NewFocus 63") < 0:
+    def connect(self, port):
+        try:
+            self.l = visa.instrument("GPIB::%d" % port)
+
+            self.idn = self.l.ask("*IDN?")
+            if self.idn.find("NewFocus 63") < 0:
+                self.connected = False
+                del self.l
+            else:
+                self.connected = True
+                self.set_remote()
+                # make sure wavelength tracking is off
+                self.l.ask(":OUTP:TRAC OFF")
+        except visa.VisaIOError:
             self.connected = False
-            del self.l
-        else:
-            self.connected = True
-            self.set_remote()
-            # make sure wavelength tracking is off
-            self.l.ask(":OUTP:TRAC OFF")
 
     def ok(self):
         return self.connected
@@ -24,6 +30,7 @@ class Vl63(object):
         return self.idn
 
     def set_piezo(self, v):
+        v = float(v)
         r = self.l.ask(":VOLT %.1f" % v)
         if r != "OK":
             print("error: %s (%f)" % (r, v))
