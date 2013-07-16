@@ -45,7 +45,9 @@ class Vl63(object):
         return float(self.l.ask(":SENS:WAVE"))
 
     def set_wave(self, wave):
-        self.l.write(":WAVE %.2f" % float(wave))
+        self.l.ask(":WAVE %.2f" % float(wave))
+        self.wait()
+        self.l.write(":OUTP:TRAC OFF")
 
     def sense_current(self):
         return float(self.l.ask(":SENS:CURR:DIOD"))
