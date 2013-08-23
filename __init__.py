@@ -26,13 +26,14 @@ except ImportError:
     WlMeter = mock('wl')
 
 
+SAMock = mock('save', 'endsave')
 
 try:
     from zmqq import QDaq, SA
 except ImportError:
     print("no zmq")
     QDaq = mock('start', 'stop')
-    SA = mock('save', 'endsave')
+    SA = SAMock
 
 
 

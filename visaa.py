@@ -112,12 +112,36 @@ class Vl63(object):
 
 class WlMeter(object):
     def __init__(self, port=4):
-        self.i = visa.instrument("GPIB::%d" % port)
+        try:
+            self.i = visa.instrument("GPIB::%d" % port)
+            self.connected = True
 
-        self.i.write(":INIT:CONT OFF")
+            self.i.write(":INIT:CONT OFF")
+        except visa.VisaIOError:
+            self.connected = False
+
+
+    def ok(self):
+        return self.connected
 
     def wl(self):
-        return float(self.i.ask(":MEAS:SCAL:POW:WAV?"))
+        # let this func fail silently
+        if self.connected:
+            return float(self.i.ask(":MEAS:SCAL:POW:WAV?"))
+        else:
+            return 0
+
+    def power(self):
+        if self.connected:
+            return float(self.i.ask("MEAS:POW?"))
+        else:
+            return 0
+
+    def fetch_power(self):
+        if self.connected:
+            return float(self.i.ask("MEAS:POW?"))
+        else:
+            return 0
 
 
 if __name__ == "__main__":
