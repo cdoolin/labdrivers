@@ -43,3 +43,8 @@ except ImportError:
     print("no websocket-client")
     LaserClient = mock()
 
+try:
+    from daq import SimpleDaq
+except ImportError:
+    print("no nidaqmx")
+    SimpleDaq = mock('read')
