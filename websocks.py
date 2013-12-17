@@ -1,12 +1,12 @@
 import websocket
 import json
 
-class LaserClient(object):
-    def __init__(self, server="127.0.0.1"):
+
+class WSClient(object):
+    def __init__(self, server=):
         self.connect(server)
 
-    def connect(self, server):
-        url = "ws://%s:1134/socket" % server
+    def connect(self, url):
         try:
             self.ws = websocket.create_connection(url)
         except:
@@ -16,10 +16,6 @@ class LaserClient(object):
         return self.ws is not None
 
 
-    def set_volt(self, V):
-        V = round(float(V), 1)
-        self.call("volt", volt=V)
-        self.wait_for(action="piezo")
 
     def call(self, action, **kwargs):
         kwargs.update(action=action)
@@ -36,6 +32,24 @@ class LaserClient(object):
             elif msg['action'] == "nolaser":
                 print("no laser connected")
                 waiting = False
+
+class LaserClient(object):
+    def __init__(self, server="127.0.0.1"):
+        self.connect("ws://%s:1134/socket" %server)
+
+    def set_volt(self, V):
+        V = round(float(V), 1)
+        self.call("volt", volt=V)
+        self.wait_for(action="piezo")
+
+class ScantechClient(object):
+    def __init__(self, server="127.0.0.1"):
+        self.connect("ws://%s:5544/socket" %server)
+
+    def set_wave(self, wave):
+        self.call("wave", wave=wave)
+        self.wait_for(action="wave")
+
 
 
 if __name__ == "__main__":
