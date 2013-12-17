@@ -39,6 +39,7 @@ except ImportError:
 
 try:
     from websocks import LaserClient
+    from websocks import ScantechClient
 except ImportError:
     print("no websocket-client")
     LaserClient = mock()
