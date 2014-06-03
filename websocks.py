@@ -4,10 +4,10 @@ import json
 
 class WSClient(object):
     def __init__(self, server):
+
         self.connect(server)
 
-    def connect(self, server):
-        url = "ws://%s:1134/socket" % server
+    def connect(self, url):
         try:
             self.ws = websocket.create_connection(url)
         except:
@@ -17,10 +17,6 @@ class WSClient(object):
         return self.ws is not None
 
 
-    def set_volt(self, V):
-        V = round(float(V), 1)
-        self.call("volt", volt=V)
-        self.wait_for(action="piezo")
 
     def call(self, action, **kwargs):
         kwargs.update(action=action)

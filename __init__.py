@@ -39,7 +39,13 @@ except ImportError:
 
 try:
     from websocks import LaserClient
+    from websocks import ScantechClient
 except ImportError:
     print("no websocket-client")
     LaserClient = mock()
 
+try:
+    from daq import SimpleDaq
+except ImportError:
+    print("no nidaqmx")
+    SimpleDaq = mock('read')
