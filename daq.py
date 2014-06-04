@@ -1,5 +1,4 @@
-from libnidaqmx import AnalogInputTask
-#import numpy as np
+from nidaqmx import AnalogInputTask
 
 class SimpleDaq(object):
     def __init__(self, channel, rate, n,maxv=3.):
@@ -22,3 +21,10 @@ class SimpleDaq(object):
         data = self.task.read(self.n, fill_mode='group_by_channel')
         self.task.stop()
         return data
+
+
+if __name__ == "__main__":
+    print("reading from /dev1...")
+    daq = SimpleDaq(["/dev1/ai%d" % i for i in range(3)], 1000, 10)
+    print(daq.read())
+

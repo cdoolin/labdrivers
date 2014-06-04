@@ -10,8 +10,10 @@ class WSClient(object):
     def connect(self, url):
         try:
             self.ws = websocket.create_connection(url)
-        except:
-            self.ws = None
+        except Exception as e:
+            print("could not connect to %s" % url)
+            raise e
+
 
     def ok(self):
         return self.ws is not None
@@ -43,6 +45,7 @@ class LaserClient(WSClient):
         V = round(float(V), 1)
         self.call("volt", volt=V)
         self.wait_for(action="piezo")
+
 
 class ScantechClient(WSClient):
     def __init__(self, server="127.0.0.1"):
