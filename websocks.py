@@ -44,9 +44,15 @@ class LaserClient(WSClient):
         self.call("volt", volt=V)
         self.wait_for(action="piezo")
 
-    def save_qdaq(self):
-        self.call("save_qdaq")
-        self.wait_for(action="qdaq_saved")
+    def scan(self, start, stop, slew, save=False):
+        self.call("scanonce", start=start, stop=stop, slew=slew, save=save)
+        while True:
+            msg = self.wait_for("status")
+            if msg['text'] == "scan in progress":
+                print("scan already in progress :(")
+                return None
+            elif msg['text'] == "done scan":
+                return msg
 
 
 class ScantechClient(WSClient):
