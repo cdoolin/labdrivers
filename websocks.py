@@ -81,7 +81,5 @@ class ScantechClient(WSClient):
 
 
 if __name__ == "__main__":
-    l = LaserClient()
-
     import IPython
     IPython.embed()
