@@ -102,4 +102,3 @@ class QDaq(ZMQConnector):
             self.sock.recv()
         except:
             pass
-   
