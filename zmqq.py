@@ -13,8 +13,9 @@ class ZMQConnector(object):
         if self.sock is not None:
             self.sock.close()
         self.sock = context.socket(zmq.REQ)
-        self.sock.RCVTIMEO = timeout
         self.sock.LINGER = 0
+        self.sock.RCVTIMEO = timeout
+        self.timeout = timeout
 
         try:    
             self.sock.connect("tcp://%s:%d" % (server, int(port)))
@@ -27,9 +28,11 @@ class ZMQConnector(object):
 
 
     def ok(self):
+        #return False
         if self.sock.closed:
             return False
         connected = False
+        self.sock.RCVTIMEO = 200
         try:
             self.sock.send('ping', zmq.NOBLOCK)
 
@@ -42,8 +45,9 @@ class ZMQConnector(object):
             except zmq.Again:
                 pass
         except zmq.Again:
-            print "again"
+            print "zmqq: again"
 
+        self.sock.RCVTIMEO = self.timeout
         return connected
 
 
@@ -71,7 +75,7 @@ class SA(ZMQConnector):
 class QDaq(ZMQConnector):
     def __init__(self, server="localhost", port=1619):
         self.sock = None
-        self.connect(server, port)
+        self.connect(server, port, timeout=60000)
 
     def start(self):
         msg = "startdaq"
@@ -93,7 +97,7 @@ class QDaq(ZMQConnector):
         msg = "savedaq"
         if len(name) > 0:
             msg += ";" + name
-        try:    
+        try:
             self.sock.send(msg)
             self.sock.recv()
         except:
