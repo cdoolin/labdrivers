@@ -69,6 +69,10 @@ class ScantechClient(WSClient):
         self.call("checkfinetune")
         return self.wait_for(action="ftret")
 
+    def scan(self, start, stop, speed, save=False):
+        self.call("scan", start=start, stop=stop, speed=speed, save=save)
+        return self.wait_for(action="scan_stopped")
+
 
 if __name__ == "__main__":
     l = LaserClient()
