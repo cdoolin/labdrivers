@@ -18,8 +18,6 @@ class WSClient(object):
     def ok(self):
         return self.ws is not None
 
-
-
     def call(self, action, **kwargs):
         kwargs.update(action=action)
         self.ws.send(json.dumps(kwargs))
@@ -36,7 +34,7 @@ class WSClient(object):
                 print("no laser connected")
                 return None
 
-				
+
 class LaserClient(WSClient):
     def __init__(self, server="127.0.0.1"):
         self.connect("ws://%s:1134/socket" %server)
@@ -45,6 +43,10 @@ class LaserClient(WSClient):
         V = round(float(V), 1)
         self.call("volt", volt=V)
         self.wait_for(action="piezo")
+
+    def save_qdaq(self):
+        self.call("save_qdaq")
+        self.wait_for(action="qdaq_saved")
 
 
 class ScantechClient(WSClient):

@@ -88,4 +88,11 @@ class QDaq(ZMQConnector):
             self.sock.recv()
         except:
             pass
-   
+
+    def save(self, name=""):
+        msg = "stopdaq;%s" % name
+        try:    
+            self.sock.send(msg)
+            self.sock.recv()
+        except:
+            pass
