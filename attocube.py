@@ -1,5 +1,20 @@
 import serial
 
+#def linspace(a, b, n):
+#    dx = (float(b) - float(a)) / (n - 1.)
+#    x = a
+#    while n > 0:
+#        yield x
+#        x += dx
+#        n -= 1
+
+def stepto(a, b, d):
+    d = abs(d) if b > a else -abs(d)
+    while abs(b - a) > abs(d):
+        a += d
+        yield a
+    yield b
+
 class Attocube(object):
     def __init__(self, port):
         self.port = port
@@ -18,6 +33,8 @@ class Attocube(object):
             if last == "OK\r\n":
                 # message finished OK
                 return resp
+            elif last == "ERROR\r\n":
+                return "error"
             elif last == "":
                 # serialport timedout
                 return "timeout"
@@ -36,6 +53,11 @@ class Attocube(object):
 
     def set_offset(self, axis, volt):
         self.ask("seta %d %f" % (axis, volt))
+
+    def slideto(self, axis, offset, dx=.1):
+        for offset in stepto(self.get_offset(axis), offset, dx):
+            self.set_offset(axis, offset)
+
 
 if __name__ == "__main__":
     port = raw_input("serial port: ")
