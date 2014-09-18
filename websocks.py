@@ -1,5 +1,6 @@
 import websocket
 import json
+import time
 
 
 class WSClient(object):
@@ -53,6 +54,13 @@ class LaserClient(WSClient):
                 return None
             elif msg['text'] == "done scan":
                 return msg
+
+    def set_wave(self, wave):
+        self.call("goto", wave=wave)
+        time.sleep(.05)
+        self.wait_for("ready")
+
+            
 
 
 class ScantechClient(WSClient):
