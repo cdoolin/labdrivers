@@ -88,6 +88,23 @@ class ScantechClient(WSClient):
         return self.wait_for(action="scan_stopped")
 
 
+class OpticsControl(WSClient):
+    def __init__(self, server="127.0.0.1"):
+        self.connect("ws://%s:8847/socket" % server)
+
+    def set_switch(self, name, state):
+        self.call("switch", name=name, state=state)
+        self.wait_for(action="switched")
+
+    def set_switches(self, **kwargs):
+        for name, state in kwargs.iteritems():
+            self.set_switch(name=name, state=state)
+
+
+
+
+
+
 if __name__ == "__main__":
     import IPython
     IPython.embed()
