@@ -100,7 +100,15 @@ class OpticsControl(WSClient):
         for name, state in kwargs.iteritems():
             self.set_switch(name=name, state=state)
 
+    def set_analog(volt):
+        volt = float(volt)
+        if volt < 0. or volt > 5.:
+            msg = "voltage (%g) outside 0-5 V" % volt
+            raise ValueError(msg)
 
+        self.call("analog", volt=volt)
+        self.wait_for(action="analoged")
+        
 
 
 
