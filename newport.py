@@ -9,6 +9,7 @@ class Vl67:
 
     def connect(self):
         self.l = newpdll.Device()
+        # self.l.verbose = True
 
         self.idn = self.l.ask("*IDN?")
         if self.idn.find("TLB-6700") < 0:
@@ -44,13 +45,11 @@ class Vl67:
         return float(self.l.ask("SENS:WAVE"))
 
     def set_wave(self, wave):
-        self.l.verbose = True
         self.l.ask("SOUR:WAVE %.2f" % float(wave))
         self.l.ask("OUTP:TRAC 1")
         time.sleep(.01)
         self.wait()
         self.l.ask("OUTP:TRAC 0")
-        self.l.verbose = False
 
     def sense_current(self):
         #print self.l
