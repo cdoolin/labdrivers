@@ -1,21 +1,40 @@
+import socket
 import zmq
+if socket.socket.__module__ == "gevent.socket":
+    from gevent.coros import RLock
+    #print("MANKEY PATCHD")
+else:
+    class RLock:
+        def acquire(self):
+            pass
+        def release(self):
+            pass
 
 context = zmq.Context()
 
-class ZMQConnector(object):
-    def __init__(self, server="localhost"):
-        self.sock = None
-        self.connect(server)
-        
-    def connect(self, server, port, timeout=200):
-        self.server = server
+def lock(func):
+    def lockedfunc(*args, **kwargs):
+        with args[0].lock:
+            r = func(*args, **kwargs)
+        #args[0].lock.release()
+        return r
+    return lockedfunc
 
+class ZMQConnector(object):
+    def __init__(self, timeout=200):
+        self.timeout = timeout
+        self.sock = None
+        self.lock = RLock()
+        
+    @lock
+    def connect(self, server, port):
+        self.server = server
+        
         if self.sock is not None:
             self.sock.close()
         self.sock = context.socket(zmq.REQ)
         self.sock.LINGER = 0
-        self.sock.RCVTIMEO = timeout
-        self.timeout = timeout
+        self.sock.RCVTIMEO = self.timeout
 
         try:    
             self.sock.connect("tcp://%s:%d" % (server, int(port)))
@@ -24,9 +43,11 @@ class ZMQConnector(object):
             self.sock.close()
             con = False
 
+   
         return con
 
 
+    @lock
     def ok(self):
         #return False
         if self.sock.closed:
@@ -46,59 +67,47 @@ class ZMQConnector(object):
                 pass
         except zmq.Again:
             print "zmqq: again"
-
         self.sock.RCVTIMEO = self.timeout
         return connected
+
+    @lock
+    def ask(self, msg):
+        print self.sock.RCVTIMEO
+        try:    
+            self.sock.send(msg)
+            response = self.sock.recv()
+        except Exception as e:
+            #print("couldn't send '%s': %s" % (msg, e))
+            response = None
+        return response
 
 
 class SA(ZMQConnector):
     def __init__(self, server="localhost", port=6634):
-        self.sock = None
-        self.connect(server, port, timeout=60000)
+        ZMQConnector.__init__(self, timeout=60000)
+        self.connect(server, port)
 
     def save(self, ntimes=1, info=""):
-        msg = "save;%d;%s" % (ntimes, info)
-        try:    
-            self.sock.send(msg)
-            self.sock.recv()
-        except:
-            pass
+        return self.ask("save;%d;%s" % (ntimes, info))
 
     def endsave(self):
-        msg = "endsave"
-        try:    
-            self.sock.send(msg)
-            self.sock.recv()
-        except:
-            pass
+        return self.ask("endsave")
+
 
 class QDaq(ZMQConnector):
     def __init__(self, server="localhost", port=1619):
-        self.sock = None
-        self.connect(server, port, timeout=60000)
+        ZMQConnector.__init__(self, timeout=60000)
+        self.connect(server, port)
 
     def start(self):
-        msg = "startdaq"
-        try:    
-            self.sock.send(msg)
-            self.sock.recv()
-        except:
-            pass
+        return self.ask("startdaq")
 
     def stop(self):
-        msg = "stopdaq"
-        try:    
-            self.sock.send(msg)
-            self.sock.recv()
-        except:
-            pass
+        return self.ask("stopdaq")
+
 
     def save(self, name=""):
         msg = "savedaq"
         if len(name) > 0:
             msg += ";" + name
-        try:
-            self.sock.send(msg)
-            self.sock.recv()
-        except:
-            pass
+        return self.ask(msg)
