@@ -1,5 +1,6 @@
 import websocket
 import json
+import time
 
 
 class WSClient(object):
@@ -54,6 +55,13 @@ class LaserClient(WSClient):
             elif msg['text'] == "done scan":
                 return msg
 
+    def set_wave(self, wave):
+        self.call("goto", wave=wave)
+        time.sleep(.05)
+        self.wait_for("ready")
+
+            
+
 
 class ScantechClient(WSClient):
     def __init__(self, server="127.0.0.1"):
@@ -80,8 +88,31 @@ class ScantechClient(WSClient):
         return self.wait_for(action="scan_stopped")
 
 
-if __name__ == "__main__":
-    l = LaserClient()
+class OpticsControl(WSClient):
+    def __init__(self, server="127.0.0.1"):
+        self.connect("ws://%s:8847/socket" % server)
 
+    def set_switch(self, name, state):
+        self.call("switch", name=name, state=state)
+        self.wait_for(action="switched")
+
+    def set_switches(self, **kwargs):
+        for name, state in kwargs.iteritems():
+            self.set_switch(name=name, state=state)
+
+    def set_analog(self, volt):
+        volt = float(volt)
+        if volt < 0. or volt > 5.:
+            msg = "voltage (%g) outside 0-5 V" % volt
+            raise ValueError(msg)
+
+        self.call("analog", volt=volt)
+        self.wait_for(action="analoged")
+        
+
+
+
+
+if __name__ == "__main__":
     import IPython
     IPython.embed()
