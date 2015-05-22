@@ -12,7 +12,7 @@ class Vl67:
         # self.l.verbose = True
 
         self.idn = self.l.ask("*IDN?")
-        if self.idn.find("TLB-6700") < 0:
+        if self.idn.find("6700") < 0:
             self.connected = False
         else:
             self.connected = True
