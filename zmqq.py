@@ -10,13 +10,18 @@ else:
         def release(self):
             pass
 
+glock = RLock()
+
 context = zmq.Context()
 
 def lock(func):
     def lockedfunc(*args, **kwargs):
-        with args[0].lock:
+        # with args[0].lock:
+        print("in %s" % func.__name__)
+        with glock:
             r = func(*args, **kwargs)
         #args[0].lock.release()
+        print("out %s" % func.__name__)
         return r
     return lockedfunc
 

@@ -41,7 +41,7 @@ class LaserClient(WSClient):
         self.connect("ws://%s:1134/socket" %server)
 
     def set_volt(self, V):
-        V = round(float(V), 1)
+        V = float(V)
         self.call("volt", volt=V)
         self.wait_for(action="piezo")
 

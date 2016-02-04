@@ -31,7 +31,7 @@ class Vl67:
 
     def set_piezo(self, v):
         v = float(v)
-        r = self.l.ask("SOUR:VOLT:PIEZ %.1f" % v)
+        r = self.l.ask("SOUR:VOLT:PIEZ %.2f" % v)
         if r != "OK":
             print("error: %s (%f)" % (r, v))
 
@@ -108,7 +108,7 @@ class Vl67:
 
     def wait(self):
         while int(self.l.ask("*OPC?")) is 0:
-            time.sleep(.005)
+            time.sleep(.01)
 
     def set_power(self, on):
         self.l.ask("OUTP:STAT %d" % int(on))
@@ -116,6 +116,9 @@ class Vl67:
     def powered(self):
         return int(self.l.ask("OUTP:STAT?")) == 1
         
+    def set_track(self, track):
+        self.l.ask("OUTP:TRAC %d" % (bool(track)))
+
         
 
 
