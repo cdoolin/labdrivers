@@ -12,10 +12,12 @@ class WlMeter(object):
         if len(a) > 1:
             import rpyc
             self.conn = rpyc.classic.connect(a[0])
-            self.i = self.conn.modules.visa.instrument(a[1])
+#            self.i = self.conn.modules.visa.instrument(a[1])
+            rm = self.conn.modules.visa.ResourceManager()
         else:
             import visa
-            self.i = visa.instrument(a[0])
+            rm = visa.ResourceManager()
+        self.i = rm.open_resource(a[0])
 
     def wl(self):
         return float(self.i.ask(":MEAS:SCAL:POW:WAV?"))
