@@ -23,6 +23,10 @@ class WlMeter(object):
 
     def power(self):
         return float(self.i.ask("MEAS:POW?"))
+		
+
+    def ok(self):
+        return self.connected
 
 
 
