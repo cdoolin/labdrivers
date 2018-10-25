@@ -9,9 +9,10 @@ class Vl67:
 
     def connect(self):
         self.l = newpdll.Device()
+        # self.l.verbose = True
 
         self.idn = self.l.ask("*IDN?")
-        if self.idn.find("TLB-6700") < 0:
+        if self.idn.find("6700") < 0:
             self.connected = False
         else:
             self.connected = True
@@ -30,7 +31,7 @@ class Vl67:
 
     def set_piezo(self, v):
         v = float(v)
-        r = self.l.ask("SOUR:VOLT:PIEZ %.1f" % v)
+        r = self.l.ask("SOUR:VOLT:PIEZ %.2f" % v)
         if r != "OK":
             print("error: %s (%f)" % (r, v))
 
@@ -44,13 +45,11 @@ class Vl67:
         return float(self.l.ask("SENS:WAVE"))
 
     def set_wave(self, wave):
-        self.l.verbose = True
         self.l.ask("SOUR:WAVE %.2f" % float(wave))
         self.l.ask("OUTP:TRAC 1")
         time.sleep(.01)
         self.wait()
         self.l.ask("OUTP:TRAC 0")
-        self.l.verbose = False
 
     def sense_current(self):
         #print self.l
@@ -109,7 +108,7 @@ class Vl67:
 
     def wait(self):
         while int(self.l.ask("*OPC?")) is 0:
-            time.sleep(.005)
+            time.sleep(.01)
 
     def set_power(self, on):
         self.l.ask("OUTP:STAT %d" % int(on))
@@ -117,6 +116,9 @@ class Vl67:
     def powered(self):
         return int(self.l.ask("OUTP:STAT?")) == 1
         
+    def set_track(self, track):
+        self.l.ask("OUTP:TRAC %d" % (bool(track)))
+
         
 
 

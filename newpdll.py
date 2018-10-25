@@ -26,6 +26,8 @@ from exceptions import RuntimeError
 import atexit
 from collections import namedtuple
 
+import sys
+
 # let's not load the newpdll on import, so programs won't break
 # immediately if the dll isn't present.  It will only break when
 # actually doing something with the library.
@@ -96,12 +98,16 @@ class Device(object):
         self.devid = ctypes.c_long(id)
         self.buff = ctypes.create_string_buffer(64);
         self.n = ctypes.c_ulong(0)
-        self.verbose = False
+        self.verbose = True
 
     def ask(self, q):
         # sends message q to newport device and returns the reply.
         # must use create_string_buffer or python will crash.
+        if self.verbose:
+            sys.stderr.write("'%s' -" % q)
+        print("2")
         c_q = ctypes.create_string_buffer(q)
+        print("3")
         err = newpdll.newp_usb_send_ascii(
             self.devid, c_q, ctypes.c_ulong(len(q)))
         if err != 0:
@@ -129,7 +135,7 @@ class Device(object):
             reply = reply[:end]
 
         if self.verbose:
-            print("%s -> %s" % (q, reply))
+            sys.stderr.write("> %s\n" % reply)
 
         return reply
 

@@ -8,8 +8,9 @@ class Vl63(object):
         self.connect(port)
 
     def connect(self, port):
+        rm = visa.ResourceManager()
         try:
-            self.l = visa.instrument("GPIB::%d" % port)
+            self.l = rm.open_resource("GPIB::%d" % port)
 
             self.idn = self.l.ask("*IDN?")
             if self.idn.find("NewFocus 63") < 0:
@@ -107,13 +108,15 @@ class Vl63(object):
 
     def powered(self):
         return int(self.l.ask(":OUTP?")) == 1
-        
-        
-
+    
+    def wl_input_mode(self):
+	self.l.write(":SYST:WINP 1")
+	
 class WlMeter(object):
     def __init__(self, port=4):
+        rm = visa.ResourceManager()
         try:
-            self.i = visa.instrument("GPIB::%d" % port)
+            self.i = rm.open_resource("GPIB::%d" % port)
             self.connected = True
 
             self.i.write(":INIT:CONT OFF")
