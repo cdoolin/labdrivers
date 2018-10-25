@@ -102,8 +102,8 @@ class ScantechClient(WSClient):
         self.wait_for(action="set_power")
 		
     def attenuation(self, attn):
-		self.call("attenuation", attenuation = attn)
-		self.wait_for(action="set_attenuation")
+        self.call("attenuation", attenuation = attn)
+        self.wait_for(action="set_attenuation")
 		
     def check_ft(self):
         self.call("checkfinetune")
