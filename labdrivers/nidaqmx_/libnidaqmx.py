@@ -118,9 +118,9 @@ def _find_library():
             % (libname), ImportWarning)
     else:
         if os.name == 'nt':
-            lib = ctypes.windll.LoadLibrary(libfile)
+            lib = ctypes.windll.LoadLibrary(str(libfile))
         else:
-            lib = ctypes.cdll.LoadLibrary(libfile)
+            lib = ctypes.cdll.LoadLibrary(str(libfile))
 
     # FIXME If lib is None.
     return header_name, lib

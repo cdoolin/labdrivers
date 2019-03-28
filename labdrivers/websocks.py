@@ -61,16 +61,29 @@ class LaserClient(WSClient):
                 return msg
 
     def set_wave(self, wave):
+       # print "1" 
         self.call("goto", wave=wave)
+      #  print "2"
         time.sleep(.05)
         self.wait_for("ready")
+        #return
 
+    def sense_wave(self):
+        self.call("checklaser")
+        msg = self.wait_for("laser")
+        return msg['wave']
+    
+    def wavelength_input_mode(self):
+        self.call("wl_input_mode")
+        
+    def interrupt(self):
+        self.call("interrupt")
             
 
 
 class ScantechClient(WSClient):
-    def __init__(self, server="127.0.0.1"):
-        self.connect("ws://%s:5544/socket" % server)
+    def __init__(self, server="127.0.0.1", port=5544):
+        self.connect("ws://%s:%d/socket" % (server, int(port)))
 
     def set_wave(self, wave):
         self.call("wave", wave=wave)
@@ -83,16 +96,31 @@ class ScantechClient(WSClient):
     def power_mode(self, mode):
         self.call("powermode", mode=mode)
         self.wait_for(action="powermode")
+        
+    def power(self, pwr):
+        self.call("power", power=pwr)
+        self.wait_for(action="set_power")
+		
+    def attenuation(self, attn):
+        self.call("attenuation", attenuation = attn)
+        self.wait_for(action="set_attenuation")
 		
     def check_ft(self):
         self.call("checkfinetune")
         return self.wait_for(action="ftret")
 
-    def scan(self, start, stop, speed, save=False):
-        self.call("scan", start=start, stop=stop, speed=speed, save=save)
+    def scan(self, start, stop, speed):#, save=False):
+        self.call("scan", start=start, stop=stop, speed=speed)#, save=save) Might need this for other computers
         return self.wait_for(action="scan_stopped")
 
-
+    def tell_all(self):
+        self.call("tell_all")
+        return self.wait_for(action="tell_all")
+        
+    def chk_wave(self):
+        self.call("chk_wave")
+        return self.wait_for(action="chk_wave")
+        
 class OpticsControl(WSClient):
     def __init__(self, server="127.0.0.1"):
         self.connect("ws://%s:8847/socket" % server)
