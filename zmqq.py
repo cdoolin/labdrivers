@@ -1,16 +1,19 @@
-import socket
+# import socket
+from gevent import socket
 import zmq
-if socket.socket.__module__ == "gevent.socket":
-    from gevent.coros import RLock
-    #print("MANKEY PATCHD")
-else:
-    class RLock:
-        def acquire(self):
-            pass
-        def release(self):
-            pass
+# if socket.socket.__module__ == "gevent.socket":
+#     from gevent.coros import RLock
+#     print("MANKEY PATCHD")
+# else:
+#     print("dummy lock")
+#     class RLock:
+#         def acquire(self):
+#             pass
+#         def release(self):
+#             pass
 
-glock = RLock()
+from gevent.lock import Semaphore
+glock = Semaphore()
 
 context = zmq.Context()
 
@@ -29,26 +32,26 @@ class ZMQConnector(object):
     def __init__(self, timeout=200):
         self.timeout = timeout
         self.sock = None
-        self.lock = RLock()
-        
+        self.lock = Semaphore()
+
     @lock
     def connect(self, server, port):
         self.server = server
-        
+
         if self.sock is not None:
             self.sock.close()
         self.sock = context.socket(zmq.REQ)
         self.sock.LINGER = 0
         self.sock.RCVTIMEO = self.timeout
 
-        try:    
+        try:
             self.sock.connect("tcp://%s:%d" % (server, int(port)))
             con = True
         except zmq.ZMQError:
             self.sock.close()
             con = False
 
-   
+
         return con
 
 
@@ -78,7 +81,7 @@ class ZMQConnector(object):
     @lock
     def ask(self, msg):
         print self.sock.RCVTIMEO
-        try:    
+        try:
             self.sock.send(msg)
             response = self.sock.recv()
         except Exception as e:

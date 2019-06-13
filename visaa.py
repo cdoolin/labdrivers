@@ -110,7 +110,10 @@ class Vl63(object):
         return int(self.l.ask(":OUTP?")) == 1
     
     def wl_input_mode(self):
-	self.l.write(":SYST:WINP 1")
+	    self.l.write(":SYST:WINP 1")
+
+    def set_track(self, track):
+        self.l.write("OUTP:TRAC %d" % (bool(track)))
 	
 class WlMeter(object):
     def __init__(self, port=4):
