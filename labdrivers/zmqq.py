@@ -51,7 +51,6 @@ class ZMQConnector(object):
             self.sock.close()
             con = False
 
-
         return con
 
 
