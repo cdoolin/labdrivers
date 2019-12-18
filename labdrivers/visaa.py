@@ -3,13 +3,13 @@ import time
 
 
 class Vl63(object):
-    def __init__(self, port=9):
-        self.connect(port)
+    def __init__(self, address="GPIB::9"):
+        self.connect(address)
 
-    def connect(self, port):
+    def connect(self, address):
         rm = visa.ResourceManager()
         try:
-            self.l = rm.open_resource("GPIB::%d" % port)
+            self.l = rm.open_resource(address)
 
             self.idn = self.l.ask("*IDN?")
             if self.idn.find("NewFocus 63") < 0:
