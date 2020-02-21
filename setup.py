@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="labdrivers",
-    version="0.0.2",
+    version="0.1.0",
     author="Callum Doolin, Hugh Ramp",
     author_email="doolin@ualberta.ca",
     description="Collection of scripts for running experiments",
