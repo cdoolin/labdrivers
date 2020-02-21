@@ -16,10 +16,12 @@ Labdrivers includes scripts to talk to, amongst other:
 
 To use, install with pip.  An editable install is recommended so changes to the labdrivers module are automatically used by python without having to reinstall the module.  Do this with
 
-```bash
+```sh
 pip install -e .
 ```
-
 or the path to the labdrivers directory instead of "." if running from another directory.
 
-
+Alternatively, install directly from github with:
+```sh
+pip install git+https://github.com/cdoolin/labdrivers.git#egg=labdrivers
+```
